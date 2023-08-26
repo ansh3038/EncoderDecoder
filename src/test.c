@@ -1,21 +1,26 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
-#include "enco_deco.c"
 #include <assert.h>
-int main()
-{
-    char ch[] = "00010";
-    assert(binarysubstring(ch, 0) == 'C');
-    assert(base32(28) == '4');
-    assert(base32(2) == 'C');
-    assert(base32(32) == '=');
-    assert(base32(20) == 'U');
-    char *ch1 = "11";
-    char *str = "Hello World";
-    ch1 = textToBase32(str);
-    printf("%s", ch1);
-    free(ch1);
 
-    // addPadding(&ch1,strlen(ch1));
-    // printf("%s",ch1);
+void measure( char* ch){
+    int a = 0;
+    for(int j = 0; j<strlen(ch); j+=5){
+        
+    for(int i =4; i>=0;i--){
+        if(ch[j+i]=='1'){
+            a = 1<<i | a; 
+        }
+        else{
+            // a = a<<1;
+        }
+    }
+    }
+    printf("%d",a);
+}
+
+int main(){
+    char * test_string = "Hello World";
+    char* ch = "10010";
+    measure(ch);
 }

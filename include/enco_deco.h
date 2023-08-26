@@ -7,6 +7,7 @@ char* textToBase32( const char* input);
 char* base32ToText( const char* input);
 char* textToBase64( const char* input);
 char* base64ToText( const char* input);
+void textToBase32File( const char* input);
 
 
 #endif // ENCO_DECO_H
