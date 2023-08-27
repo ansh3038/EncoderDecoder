@@ -2,11 +2,13 @@
 
 This library provides a set of functions to encode and decode data using the Base32 and Base64 encoding schemes. 
 Base32 and Base64 are commonly used methods to represent binary data in a human-readable ASCII string format.
+You can see about the functions available and explanations in the header file
 
 ## Features
 
 - Encoding binary data into Base32 and Base64 representations.
 - Decoding Base32 and Base64 representations back to binary data.
+- Also you can convert a txt file to Base32 and Base64 and reverse and output it to another file.
 
 ## Getting Started
 
@@ -30,7 +32,13 @@ $ cd EncoderDecoder
 
 3. Use the code in your program to use the functions in the same folder or add the path to the header file too.
 ```
-    #include "enco_deco.h"
+#include "enco_deco.h"
 ```
 
-4. In the include folder enco_deco.a file is present to use while compliling your code. 
+4. In the include folder enco_deco.a file is present to use while compliling your code.
+
+##Contributors
+
+-Ansh Singla 
+
+Feel free to contribute to this project by submitting pull request or issues.
