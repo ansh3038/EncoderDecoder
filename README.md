@@ -37,8 +37,8 @@ $ cd EncoderDecoder
 
 4. In the include folder enco_deco.a file is present to use while compliling your code.
 
-##Contributors
+## Contributors
 
--Ansh Singla 
+- Ansh Singla 
 
 Feel free to contribute to this project by submitting pull request or issues.
