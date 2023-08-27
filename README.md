@@ -15,13 +15,22 @@ Base32 and Base64 are commonly used methods to represent binary data in a human-
 - This library is written in C. You need a C compiler to build and use it.
 - Make sure you have the necessary development libraries installed for building C programs.
 
-### Compilation
+### Using
 
 1. Clone this repository to your local machine.
 
-
+```
 $ git clone https://github.com/ansh3038/EncoderDecoder.git
+```
 
 2. Navigate to project directory
+```
 $ cd EncoderDecoder
+```
 
+3. Use the code in your program to use the functions in the same folder or add the path to the header file too.
+```
+    #include "enco_deco.h"
+```
+
+4. In the include folder enco_deco.a file is present to use while compliling your code. 
