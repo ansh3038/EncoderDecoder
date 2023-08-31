@@ -4,7 +4,29 @@
 #include <assert.h>
 // #include "enco_deco.h"
 
-//ENCODING FUNCTIONS
+// General File Functions
+
+char *inputFile(FILE *file)
+{
+    fseek(file, 0, SEEK_END);
+    long file_size = ftell(file);
+    fseek(file, 0, SEEK_SET);
+
+    char *content = (char *)malloc(file_size + 1);
+    size_t bytes_read = fread(content, 1, file_size, file);
+    content[bytes_read] = '\0';
+    return content;
+}
+
+void closeFile(char *fileName, char *str)
+{
+    FILE *ans = fopen(fileName, "w");
+    fprintf(ans, "%s", str);
+    free(str);
+    fclose(ans);
+}
+
+// ENCODING FUNCTIONS
 
 void addPadding(char **binary_data, int length, int base)
 {
@@ -19,8 +41,9 @@ void addPadding(char **binary_data, int length, int base)
             padded_data[i] = '0';
         }
         padded_data[length + padding_bits] = '\0'; // Null-terminate the string
-        free(*binary_data); // Free the original data
-        *binary_data = padded_data;*binary_data = padded_data;
+        free(*binary_data);                        // Free the original data
+        *binary_data = padded_data;
+        *binary_data = padded_data;
     }
 }
 
@@ -43,12 +66,21 @@ char *textToBinary(const char *input)
 
 char base32(int a)
 {
-    char* anskey = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+    if (a > 31)
+    {
+        return '\0';
+    }
+    char *anskey = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
     return anskey[a];
 }
 
-char base64(int a){
-    char* anskey = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+char base64(int a)
+{
+    if (a > 63)
+    {
+        return '\0';
+    }
+    char *anskey = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
     return anskey[a];
 }
 
@@ -56,7 +88,7 @@ char binarysubstring(char *ch, int start, int base)
 {
     int a = 0;
     int two = 1;
-    for (int i = start + base-1; i >= start; i--)
+    for (int i = start + base - 1; i >= start; i--)
     {
         if (ch[i] == '1')
         {
@@ -64,12 +96,14 @@ char binarysubstring(char *ch, int start, int base)
         }
         two *= 2;
     }
-    if( base == 5)
-    return base32(a);
-    else if(base == 6){
+    if (base == 5)
+        return base32(a);
+    else if (base == 6)
+    {
         return base64(a);
     }
-    else{
+    else
+    {
         return '\0';
     }
 }
@@ -77,7 +111,7 @@ char binarysubstring(char *ch, int start, int base)
 char *textToBase32(const char *input)
 {
     char *ch = textToBinary(input);
-     if (strlen(ch) % 5 != 0)
+    if (strlen(ch) % 5 != 0)
     {
         addPadding(&ch, strlen(ch), 5);
     }
@@ -99,35 +133,31 @@ char *textToBase32(const char *input)
     return ans;
 }
 
-void textToBase32File(FILE *file, char* fileName){
-    fseek(file, 0, SEEK_END);
-    long file_size = ftell(file);
-    fseek(file, 0, SEEK_SET);
-
-    char *content = (char *)malloc(file_size + 1); 
-    fread(content, 1, file_size, file);
-    content[file_size] = '\0';
-    char* str = textToBase32(content);
-    FILE *ans = fopen(fileName,"w");
-    fprintf(ans,"%s",str);   
-    free(str);
+void textToBase32File(FILE *file, char *fileName)
+{
+    char *content = inputFile(file);
+    // printf("\n%s.", content);
+    char *str = textToBase32(content);
+    closeFile(fileName, str);
     free(content);
-    fclose(ans);
     fclose(file);
 }
 
-char* textToBase64( const char* input){
-    char* ch = textToBinary(input);
+char *textToBase64(const char *input)
+{
+    char *ch = textToBinary(input);
     if (strlen(ch) % 6 != 0)
     {
         addPadding(&ch, strlen(ch), 6);
     }
-    char* ans = (char*) malloc(strlen(ch)/6*4 + 5);
+    char *ans = (char *)malloc(strlen(ch) / 6 * 4 + 5);
     int j = 0;
-    for( int i = 0; i<strlen(ch); i = i+6){
-        ans[j++] = binarysubstring(ch,i,6);
-    } 
-    while (j % 4 != 0 && j % 8 != 0) {
+    for (int i = 0; i < strlen(ch); i = i + 6)
+    {
+        ans[j++] = binarysubstring(ch, i, 6);
+    }
+    while (j % 4 != 0 && j % 8 != 0)
+    {
         ans[j++] = '=';
     }
     ans[j] = '\0';
@@ -135,32 +165,24 @@ char* textToBase64( const char* input){
     return ans;
 }
 
-void textToBase64File(FILE *file, char* fileName){
-    fseek(file, 0, SEEK_END);
-    long file_size = ftell(file);
-    fseek(file, 0, SEEK_SET);
-
-    char *content = (char *)malloc(file_size + 1); 
-    fread(content, 1, file_size, file);
-    content[file_size] = '\0';
-    char* str = textToBase64(content);
-    FILE *ans = fopen(fileName,"w");
-    fprintf(ans,"%s",str);   
+void textToBase64File(FILE *file, char *fileName)
+{
+    char *content = inputFile(file);
+    char *str = textToBase64(content);
+    closeFile(fileName, str);
     free(content);
-    free(str);
-    fclose(ans);
     fclose(file);
 }
 
-
-
-//DECODING FUNCTIONS
+// DECODING FUNCTIONS
 
 int base32ToAscii(char c)
 {
-    char* anskey = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
-    for(int i = 0; i<strlen(anskey);i++){
-        if(anskey[i]==c){
+    char *anskey = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+    for (int i = 0; i < strlen(anskey); i++)
+    {
+        if (anskey[i] == c)
+        {
             return i;
         }
     }
@@ -169,42 +191,52 @@ int base32ToAscii(char c)
 
 int base64ToAscii(char c)
 {
-    char* anskey = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-    for(int i = 0; i<strlen(anskey);i++){
-        if(anskey[i]==c){
+    char *anskey = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    for (int i = 0; i < strlen(anskey); i++)
+    {
+        if (anskey[i] == c)
+        {
             return i;
         }
     }
     return -1;
 }
 
-char binaryToASCII( char* binarysubstring, int start){
+char binaryToASCII(char *binarysubstring, int start)
+{
     int a = 0;
     int two = 1;
-    for(int i=start+7; i>=start; i--){
-        if(binarysubstring[i]=='1'){
+    for (int i = start + 7; i >= start; i--)
+    {
+        if (binarysubstring[i] == '1')
+        {
             a += two;
         }
-        two *=2;
+        two *= 2;
     }
     return a;
 }
 
-char* base32ToText(const char* input){
-    int size=0;
+char *base32ToText(const char *input)
+{
+    int size = 0;
 
-    for(int i=0;i<strlen(input);i++){
-        if(input[i]=='='){
+    for (int i = 0; i < strlen(input); i++)
+    {
+        if (input[i] == '=')
+        {
             break;
         }
-        else{
+        else
+        {
             size++;
         }
     }
 
-    char* binaryString = (char*)malloc(size*sizeof(char)*8);
+    char *binaryString = (char *)malloc(size * sizeof(char) * 8);
 
-    for(int i=0; i<size;i++){
+    for (int i = 0; i < size; i++)
+    {
 
         int ascii = base32ToAscii(input[i]);
 
@@ -212,53 +244,50 @@ char* base32ToText(const char* input){
         {
             binaryString[i * 5 + (4 - j)] = (ascii & (1 << j)) ? '1' : '0';
         }
-
     }
 
-    char* ans = (char*) (malloc(strlen(binaryString)*sizeof(char)+1));
+    char *ans = (char *)(malloc(strlen(binaryString) * sizeof(char) + 1));
     int j = 0;
 
-    for(int i =0; i<strlen(binaryString); i+=8){
-        ans[j++] = binaryToASCII(binaryString,i);
+    for (int i = 0; i < strlen(binaryString); i += 8)
+    {
+        ans[j++] = binaryToASCII(binaryString, i);
     }
-    ans[j]='\0';
+    ans[j] = '\0';
     free(binaryString);
 
     return ans;
 }
 
-void base32ToTextFile(FILE *file, char* fileName){
-    fseek(file, 0, SEEK_END);
-    long file_size = ftell(file);
-    fseek(file, 0, SEEK_SET);
-
-    char *content = (char *)malloc(file_size + 1); 
-    fread(content, 1, file_size, file);
-    content[file_size] = '\0';
-    char* str = base32ToText(content);
-    FILE *ans = fopen(fileName,"w");
-    fprintf(ans,"%s",str);   
-    free(str);
+void base32ToTextFile(FILE *file, char *fileName)
+{
+    char *content = inputFile(file);
+    char *str = base32ToText(content);
+    closeFile(fileName, str);
     free(content);
-    fclose(ans);
     fclose(file);
 }
 
-char* base64ToText(const char* input){
-    int size=0;
+char *base64ToText(const char *input)
+{
+    int size = 0;
 
-    for(int i=0;i<strlen(input);i++){
-        if(input[i]=='='){
+    for (int i = 0; i < strlen(input); i++)
+    {
+        if (input[i] == '=')
+        {
             break;
         }
-        else{
+        else
+        {
             size++;
         }
     }
 
-    char* binaryString = (char*)malloc(size*sizeof(char)*8);
+    char *binaryString = (char *)malloc(size * sizeof(char) * 6);
 
-    for(int i=0; i<size;i++){
+    for (int i = 0; i < size; i++)
+    {
 
         int ascii = base64ToAscii(input[i]);
 
@@ -266,35 +295,33 @@ char* base64ToText(const char* input){
         {
             binaryString[i * 6 + (5 - j)] = (ascii & (1 << j)) ? '1' : '0';
         }
-
     }
 
-    char* ans = (char*) (malloc(strlen(binaryString)*sizeof(char)+1));
+    char *ans = (char *)(malloc(size * sizeof(char)));
     int j = 0;
 
-    for(int i =0; i<strlen(binaryString); i+=8){
-        ans[j++] = binaryToASCII(binaryString,i);
+    for (int i = 0; i < strlen(binaryString); i += 8)
+    {
+        ans[j++] = binaryToASCII(binaryString, i);
     }
-    ans[j]='\0';
+    ans[j] = '\0';
     free(binaryString);
 
     return ans;
 }
 
-void base64ToTextFile(FILE *file, char* fileName){
-    fseek(file, 0, SEEK_END);
-    long file_size = ftell(file);
-    fseek(file, 0, SEEK_SET);
-
-    char *content = (char *)malloc(file_size + 1); 
-    fread(content, 1, file_size, file);
-    content[file_size] = '\0';
-    char* str = base64ToText(content);
-    FILE *ans = fopen(fileName,"w");
-    fprintf(ans,"%s",str);   
-    free(str);
+void base64ToTextFile(FILE *file, char *fileName)
+{
+    char *content = inputFile(file);
+    char *str = base64ToText(content);
+    closeFile(fileName, str);
     free(content);
-    fclose(ans);
     fclose(file);
 }
 
+// int main(){
+//     char * str = "Hello World";
+//     char * ans = textToBase32(str);
+//     printf("%s",ans);
+//     free(ans);
+// }

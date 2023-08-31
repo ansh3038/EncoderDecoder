@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <string.h>
+#include <unistd.h>
 #include "../src/enco_deco.c"
 
 int check_base32_base64()
@@ -20,6 +22,8 @@ int check_base32_base64()
     assert(base64(51) == 'z');
     assert(base64(62) == '+');
     assert(base64(63) == '/');
+
+    printf("base32() pass\nbase64() pass\n");
 }
 
 void check_baseToAscii()
@@ -39,6 +43,7 @@ void check_baseToAscii()
     assert(base64ToAscii('z') == 51);
     assert(base64ToAscii('0') == 52);
     assert(base64ToAscii('+') == 62);
+    printf("basetoASCII() pass\n");
 }
 
 void check_binaryToASCII()
@@ -55,84 +60,195 @@ void check_binaryToASCII()
     assert(binaryToASCII(str, 64) == 'r');
     assert(binaryToASCII(str, 72) == 'l');
     assert(binaryToASCII(str, 80) == 'd');
+    printf("binaryToASCII() pass\n");
 }
 
-void check_addPadding(){
-
+void check_addPadding()
+{
+    char* binary = malloc(sizeof(char)*15);
     char *binary1 = "10101010";
+    strcpy(binary,binary1);
     int length1 = strlen(binary1);
-    addPadding(&binary1, length1, 8);
-    assert(strcmp(binary1, "10101010") == 0);
+    addPadding(&binary, length1, 5);
 
-    char *binary2= "110110";
+    assert(strcmp(binary, "1010101000") == 0);
+    
+
+    char *binary2 = "110110";
+    strcpy(binary,binary2);
+
     int length2 = strlen(binary2);
-    addPadding(&binary2, length2, 8);
-    assert(strcmp(binary2, "11011000") == 0);
+    addPadding(&binary, length2, 8);
+    assert(strcmp(binary, "11011000") == 0);
 
-    char *binary3= "10101010";
+    char *binary3 = "1010101";
+    strcpy(binary,binary3);
+
     int length3 = strlen(binary3);
-    addPadding(&binary3, length3, 16);
-    assert(strcmp(binary3, "10101010") == 0);
+    addPadding(&binary, length3, 8);
+    assert(strcmp(binary, "10101010") == 0);
 
-    char *binary4= "110110";
+    char *binary4 = "110110";
+    strcpy(binary,binary4);
+
     int length4 = strlen(binary4);
-    addPadding(&binary4, length4, 16);
-    assert(strcmp(binary4, "1101100000000000") == 0);
+    addPadding(&binary, length4, 6);
+    assert(strcmp(binary, "110110") == 0);
+    free(binary);
+    printf("addPadding() pass\n");
 
-    char *binary5= "";
-    int length5 = strlen(binary5);
-    addPadding(&binary5, length5, 8);
-    assert(strcmp(binary5, "00000000") == 0);
+}
 
-    char *binary6= "";
-    int length6 = strlen(binary6);
-    addPadding(&binary6, length6, 16);
-    assert(strcmp(binary6, "0000000000000000") == 0);
+void check_textToBase32()
+{
+    char *input = "Hello World";
+    char *str = textToBase32(input);    
+    assert(strcmp(str, "JBSWY3DPEBLW64TMMQ======") == 0);
+    free(str);
 
-    char *binary7= "1";
-    int length7 = strlen(binary7);
-    addPadding(&binary7, length7, 8);
-    assert(strcmp(binary7, "10000000") == 0);
+    input = "world";
+    str = textToBase32(input);    
+    assert(strcmp(str, "O5XXE3DE") == 0);
+    free(str);
 
-    char *binary8= "1";
-    int length8 = strlen(binary8);
-    addPadding(&binary8, length8, 16);
-    assert(strcmp(binary8, "1000000000000000") == 0);
+    input = "1234567890";
+    str = textToBase32(input);    
+    assert(strcmp(str, "GEZDGNBVGY3TQOJQ") == 0);
+    free(str);
 
-    char *binary9= "110";
-    int length9 = strlen(binary9);
-    addPadding(&binary9, length9, 8);
-    assert(strcmp(binary9, "11000000") == 0);
+    input = "This is a test";
+    str = textToBase32(input);    
+    assert(strcmp(str, "KRUGS4ZANFZSAYJAORSXG5A=") == 0);
+    free(str);
 
-    char *binary10 = "110";
-    int length10 = strlen(binary10);
-    addPadding(&binary10, length10, 16);
-    assert(strcmp(binary10, "1100000000000000") == 0);
+    input = "";
+    str = textToBase32(input);
+    assert(strcmp(str,"")==0);
+    free(str);
+    printf("textToBase32() pass\n");
+}
 
-    char *binary11 = "10101";
-    int length11 = strlen(binary11);
-    addPadding(&binary11, length11, 5);
-    assert(strcmp(binary11, "10101") == 0);
+void check_base32toText(){
+    char * input = "JBSWY3DPEBLW64TMMQ======";
+    char * str = base32ToText(input);
+    assert(strcmp(str,"Hello World")==0);
+    free(str);
 
-    char *binary12 = "1010";
-    int length12 = strlen(binary12);
-    addPadding(&binary12, length12, 5);
-    assert(strcmp(binary12, "1010") == 0);
+    input = "O5XXE3DE";
+    str = base32ToText(input);
+    assert(strcmp(str,"world")==0);
+    free(str);
 
-    char *binary13 = "1111";
-    int length13 = strlen(binary13);
-    addPadding(&binary13, length13, 5);
-    assert(strcmp(binary13, "1111") == 0);
+    input = "GEZDGNBVGY3TQOJQ";
+    str = base32ToText(input);
+    assert(strcmp(str,"1234567890")==0);
+    free(str);
 
-    char *binary14 = "101010";
-    int length14 = strlen(binary14);
-    addPadding(&binary14, length14, 4);
-    assert(strcmp(binary14, "101010") == 0);
+    input = "KRUGS4ZANFZSAYJAORSXG5A=";
+    str = base32ToText(input);
+    assert(strcmp(str,"This is a test")==0);
+    free(str);
 
-    char *binary15 = "1010";
-    int length15 = strlen(binary15);
-    addPadding(&binary15, length15, 4);
-    assert(strcmp(binary15, "1010") == 0);
+    printf("base32ToText() pass\n");
+
+}
+
+void check_textToBase64(){
+    char * input = "Hello World";
+    char * str = textToBase64(input);
+    assert(strcmp(str,"SGVsbG8gV29ybGQ=")==0);
+    free(str);
+
+    input = "The quick brown fox jumps over the lazy dog.";
+    str = textToBase64(input);
+    assert(strcmp(str,"VGhlIHF1aWNrIGJyb3duIGZveCBqdW1wcyBvdmVyIHRoZSBsYXp5IGRvZy4=")==0);
+    free(str);
+
+    input = "Welcome\nThis is a test case";
+    str = textToBase64(input);
+    assert(strcmp(str,"V2VsY29tZQpUaGlzIGlzIGEgdGVzdCBjYXNl")==0);
+    free(str);
+
+    input = "";
+    str = textToBase64(input);
+    assert(strcmp(str,"")==0);
+    free(str);
+
+
+    printf("textToBase64() pass\n");
+
+}
+
+void check_base64ToText(){
+    char* input = "SGVsbG8gV29ybGQ";
+    char * str = base64ToText(input);
+    assert(strcmp(str,"Hello World")==0);
+    free(str);
+
+    input = "V2VsY29tZQpUaGlzIGlzIGEgdGVzdCBjYXNl";
+    str = base64ToText(input);
+    assert(strcmp(str,"Welcome\nThis is a test case")==0);
+    free(str);
+
+
+    input = "";
+    str = base64ToText(input);
+    assert(strcmp(str,"")==0);
+
+    printf("base64ToText() pass\n");
+}
+
+int compareFiles(FILE *fp1, FILE *fp2)
+{
+    char ch1 = getc(fp1);
+    char ch2 = getc(fp2);
+  
+    int error = 0, pos = 0, line = 1;
+  
+    while (ch1 != EOF && ch2 != EOF)
+    {
+        pos++;
+  
+        if (ch1 == '\n' && ch2 == '\n')
+        {
+            line++;
+            pos = 0;
+        }
+  
+        if (ch1 != ch2)
+        {
+           return 0; 
+        }
+  
+        ch1 = getc(fp1);
+        ch2 = getc(fp2);
+    }
+  
+    return 1;
+}
+
+void check_textToBase32File(){
+    FILE *input1 = fopen("input1.txt","r");
+    textToBase32File(input1,"output.txt");
+    sleep(1);
+    FILE *output = fopen("output.txt","r");
+    FILE *output1 = fopen("output1.txt","r");
+    assert(compareFiles(output1,output)==1);
+    // input
+    fclose(input1);
+    // fclose(output);
+    fclose(output1);
+    sleep(1);
+    FILE *input = fopen("input2.txt","r");
+    textToBase32File(input1,"output.txt");
+    // sleep(1);
+    // // FILE *output = fopen("output.txt","r");
+    FILE *output2 = fopen("output1.txt","r");
+    assert(compareFiles(output2,output)==1);
+
+
+    printf("textToBase32File() pass\n");
+
 }
 
 int main()
@@ -141,4 +257,9 @@ int main()
     check_baseToAscii();
     check_binaryToASCII();
     check_addPadding();
+    check_textToBase32();
+    check_base32toText();
+    check_textToBase64();
+    check_base64ToText();
+    check_textToBase32File();
 }
