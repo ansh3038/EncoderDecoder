@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-// #include "enco_deco.h"
+#include "enco_deco.h"
 
 // General File Functions
 
