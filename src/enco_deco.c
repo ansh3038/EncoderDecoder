@@ -319,9 +319,3 @@ void base64ToTextFile(FILE *file, char *fileName)
     fclose(file);
 }
 
-// int main(){
-//     char * str = "Hello World";
-//     char * ans = textToBase32(str);
-//     printf("%s",ans);
-//     free(ans);
-// }

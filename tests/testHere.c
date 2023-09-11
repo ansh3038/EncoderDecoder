@@ -3,12 +3,12 @@
 #include "../include/enco_deco.h"
 
 int main(){
-    FILE* file = fopen("","r");
+//    FILE* file = fopen("","r");
 
     char *string = "Hello World";
-    char *ans = textToBase32(string);
+    char *ans = textToBase64(string);
     printf("%s",ans);
     free(ans);
-    fclose(file);
+  //  fclose(file);
 
 }
